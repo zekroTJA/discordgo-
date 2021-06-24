@@ -1,0 +1,37 @@
+name: Unit Tests
+
+on:
+  push:
+    branches:
+      - '*'
+    paths-ignore:
+      - '**.md'
+
+jobs:
+
+  tests:
+
+    name: Tests
+    runs-on: ubuntu-latest
+
+    steps:
+
+    - name: Set up Go
+      uses: actions/setup-go@v1
+      with:
+        go-version: ^1.16
+
+    - name: Check out code
+      uses: actions/checkout@v2
+
+    - name: Check out discordgo into vendor
+      uses: actions/checkout@v2
+      with:
+        repository: 'https://github.com/zekrotja/discordgo'
+        path: 'vendor/github.com/bwmarrin/discordgo'
+    
+    - name: Run
+      env:
+        DISCORD_TOKEN: ${{ secrets.DISCORD_TOKEN }}
+      run: |
+        go run main.go -ci 549871005321920513
