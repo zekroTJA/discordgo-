@@ -27,7 +27,7 @@ jobs:
     - name: Check out discordgo into vendor
       uses: actions/checkout@v2
       with:
-        repository: 'https://github.com/zekrotja/discordgo'
+        repository: 'zekrotja/discordgo'
         path: 'vendor/github.com/bwmarrin/discordgo'
     
     - name: Run
