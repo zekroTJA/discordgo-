@@ -13,7 +13,9 @@ import (
 )
 
 var (
-	cd = flag.String("cd", "", "enabled CD test mode; sets channelid for test message")
+	ci = flag.String("ci", "", "enabled CD test mode; sets channelid for test message")
+
+	sc = make(chan os.Signal, 1)
 )
 
 func main() {
@@ -29,7 +31,7 @@ func main() {
 	// Register the messageCreate func as a callback for MessageCreate events.
 	dg.AddHandler(messageCreate)
 
-	if *cd != "" {
+	if *ci != "" {
 		dg.AddHandler(readyTest)
 	}
 
@@ -42,7 +44,6 @@ func main() {
 
 	// Wait here until CTRL-C or other term signal is received.
 	fmt.Println("Bot is now running.  Press CTRL-C to exit.")
-	sc := make(chan os.Signal, 1)
 	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt, os.Kill)
 	<-sc
 
@@ -75,7 +76,7 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 func readyTest(s *discordgo.Session, e *discordgo.Ready) {
 	const content = "Hello from CD!"
-	msg, err := s.ChannelMessageSend(*cd, content)
+	msg, err := s.ChannelMessageSend(*ci, content)
 	check(err)
 
 	msgRec, err := s.ChannelMessage(msg.ChannelID, msg.ID)
@@ -86,4 +87,5 @@ func readyTest(s *discordgo.Session, e *discordgo.Ready) {
 	}
 
 	fmt.Printf("%+v\n", msgRec)
+	sc <- syscall.SIGTERM
 }
